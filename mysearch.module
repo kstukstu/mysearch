@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Module file for mysearch.
+ */
+
+/**
+ * Menu callback provides a simple list of nodes matching the search term
+ * Example: hitting the URL: http://domain.com/mysearch/example will return
+ * a list of links to nodes which have the word example in them.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function mysearch_permission() {
+  return array(
+    'access mysearch' => array(
+      'title' => 'Access My Search',
+      'description' => 'Allows a user to access search results',
+    ),
+  );
+}
+
+/**
+ * Implements of hook_menu().
+ */
+function mysearch_menu() {
+  $items['mysearch'] = array(
+    'title' => 'Search',
+    'page callback' => 'mysearch_searchpage',
+    'access arguments' => array('access mysearch'),
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Page callback for the simplest introduction menu entry.
+ */
+function mysearch_searchpage() {
+  $searchterm = arg(1);
+  $output = '<h2>' . t("Search for ") . $searchterm . '</h2><ul>';
+  $query = db_select('node', 'n')
+    ->condition('n.status', 1)
+    ->condition('n.title', '%' . db_like($searchterm) . '%', 'LIKE');
+  $results = $query
+    ->fields('n', array('nid'))
+    ->fields('n', array('title'))
+    ->execute()
+    ->fetchAll();
+  if ($results) {
+    foreach ($results as $node) {
+      $output .= '<li><a href="/' . drupal_get_path_alias('node/' . $node->nid) . '" title="' . $node->title . '">' . $node->title . '</a></li>';
+    }
+  }
+  else {
+    $output .= '<li>No results</li>';
+  }
+
+  return $output . '</ul>';
+}
