@@ -42,21 +42,26 @@ function mysearch_menu() {
 function mysearch_searchpage() {
   $searchterm = arg(1);
   $output = '<h2>' . t("Search for ") . $searchterm . '</h2><ul>';
-  $query = db_select('node', 'n')
-    ->condition('n.status', 1)
-    ->condition('n.title', '%' . db_like($searchterm) . '%', 'LIKE');
-  $results = $query
-    ->fields('n', array('nid'))
-    ->fields('n', array('title'))
-    ->execute()
-    ->fetchAll();
-  if ($results) {
-    foreach ($results as $node) {
-      $output .= '<li><a href="/' . drupal_get_path_alias('node/' . $node->nid) . '" title="' . $node->title . '">' . $node->title . '</a></li>';
+  if ($searchterm) {
+    $query = db_select('node', 'n')
+      ->condition('n.status', 1)
+      ->condition('n.title', '%' . db_like($searchterm) . '%', 'LIKE');
+    $results = $query
+      ->fields('n', array('nid'))
+      ->fields('n', array('title'))
+      ->execute()
+      ->fetchAll();
+    if ($results) {
+      foreach ($results as $node) {
+        $output .= '<li><a href="/' . drupal_get_path_alias('node/' . $node->nid) . '" title="' . $node->title . '">' . $node->title . '</a></li>';
+      }
+    }
+    else {
+      $output .= '<li>No results</li>';
     }
   }
   else {
-    $output .= '<li>No results</li>';
+    $output .= '<li>Please, enter search term</li>';
   }
 
   return $output . '</ul>';
