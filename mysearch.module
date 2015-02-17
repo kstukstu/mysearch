@@ -41,8 +41,8 @@ function mysearch_menu() {
  */
 function mysearch_searchpage() {
   $searchterm = arg(1);
+  $output = '<h2>' . t("Search for ") . $searchterm . '</h2><ul>';
   if ($searchterm) {
-    $output = '<h2>' . t("Search for ") . $searchterm . '</h2><ul>';
     $query = db_select('node', 'n')
       ->condition('n.status', 1)
       ->condition('n.title', '%' . db_like($searchterm) . '%', 'LIKE');
@@ -61,8 +61,7 @@ function mysearch_searchpage() {
     }
   }
   else {
-    $output .= '<h2>Search term is empty</h2>';
-    $output .= '<ul><li>Please, enter search term</li>';
+    $output .= '<li>Please, enter search term</li>';
   }
 
   return $output . '</ul>';
